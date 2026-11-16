@@ -1,0 +1,12 @@
+{"id": "s0", "text": "LockBit affiliates exploited Citrix and encrypted servers. The ransom note points victims to http://lockbit-support.top/pay.", "label": "ransomware"}
+{"id": "s1", "text": "BlackCat deployed ransomware after credential dumping with Mimikatz and demanded payment for the decryptor.", "label": "ransomware"}
+{"id": "s2", "text": "FIN7 sent spearphishing emails with a malicious attachment that drops Agent Tesla. The fake login page is at login-verify.top.", "label": "phishing"}
+{"id": "s3", "text": "A phishing kit offers spoofed bank pages and credential harvest relay hosted on secure-account.xyz.", "label": "phishing"}
+{"id": "s4", "text": "A botnet used DNS amplification to flood a hosting provider in a six hour denial of service attack from 91.215.85.12.", "label": "ddos"}
+{"id": "s5", "text": "Operators launched a DDoS flood against a gaming network using a large botnet.", "label": "ddos"}
+{"id": "s6", "text": "CVE-2024-21410 allows privilege escalation in Microsoft Exchange and exploit code is public. Patch immediately.", "label": "vuln_exploit"}
+{"id": "s7", "text": "CVE-2024-22252 is a remote code execution zero-day in VMware that is being actively exploited.", "label": "vuln_exploit"}
+{"id": "s8", "text": "Raccoon Stealer uses DLL sideloading and PowerShell, then data exfiltration to 185.220.101.4. Hash 5d41402abc4b2a76b9719d911017c592.", "label": "malware"}
+{"id": "s9", "text": "AsyncRAT is a backdoor trojan that gains persistence with a scheduled task and talks to cdn-update.cc.", "label": "malware"}
+{"id": "s10", "text": "The vendor published its annual security awareness training calendar for the coming year.", "label": "other"}
+{"id": "s11", "text": "A conference panel discussed hiring and retention for security operations teams.", "label": "other"}

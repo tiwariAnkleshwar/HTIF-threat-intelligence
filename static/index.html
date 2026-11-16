@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HTIF Threat Intelligence Platform</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--ink:#1f2937;--mute:#6b7280;--line:#e5e7eb;--pri:#2563eb;--prid:#1d4ed8;--side:#111827;--sideink:#d1d5db;
+--Low:#16a34a;--Medium:#d97706;--High:#ea580c;--Critical:#dc2626}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+@media(max-width:800px){.app{grid-template-columns:1fr}.side{flex-direction:row!important;overflow-x:auto;align-items:center}.side h1{display:none}}
+.side{background:var(--side);color:var(--sideink);display:flex;flex-direction:column;padding:16px 10px;gap:4px}
+.side h1{color:#fff;font-size:16px;margin:4px 10px 16px}.side h1 small{display:block;color:#9ca3af;font-weight:400;font-size:12px}
+.side button{background:none;border:0;color:inherit;text-align:left;padding:9px 12px;border-radius:6px;font:inherit;cursor:pointer;white-space:nowrap}
+.side button:hover{background:#1f2937}.side button.on{background:var(--pri);color:#fff}
+.main{display:flex;flex-direction:column;min-width:0}
+.top{background:var(--card);border-bottom:1px solid var(--line);padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.top h2{margin:0;font-size:18px}#status{font-size:13px;color:var(--mute)}#status i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ca3af;margin-right:6px}
+#status.ok i{background:var(--Low)}#status.bad i{background:var(--Critical)}
+.page{padding:24px;max-width:1200px;width:100%}
+.grid{display:grid;gap:16px}.k4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.c2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.card h3{margin:0 0 12px;font-size:15px}.kpi .v{font-size:28px;font-weight:700}.kpi .l{color:var(--mute);font-size:13px}
+.mt{margin-top:16px}
+button.btn{font:inherit;padding:8px 16px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+button.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}button.btn.pri:hover{background:var(--prid)}button.btn:disabled{opacity:.6}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+textarea{width:100%;min-height:200px;padding:10px;border:1px solid #d1d5db;border-radius:6px;font:13px/1.5 Consolas,monospace;resize:vertical}
+table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--mute);font-weight:600;font-size:12.5px;background:#f9fafb}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}.scroll{overflow-x:auto}
+.badge{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:600;color:#fff}
+.b-Low{background:var(--Low)}.b-Medium{background:var(--Medium)}.b-High{background:var(--High)}.b-Critical{background:var(--Critical)}
+.tag{background:#eef2ff;color:#3730a3;padding:1px 8px;border-radius:4px;font-size:12.5px;margin:2px 3px 2px 0;display:inline-block}
+.mono{font-family:Consolas,monospace;font-size:12.5px;word-break:break-all}
+.bar{height:10px;background:#e5e7eb;border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pri)}
+.row{display:grid;grid-template-columns:140px 1fr 44px;gap:10px;align-items:center;margin:7px 0}
+.mute{color:var(--mute)}.hidden{display:none}.err{border-color:var(--Critical);color:var(--Critical)}
+.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--card:#1e293b;--ink:#e5e7eb;--mute:#94a3b8;--line:#334155}th{background:#0f172a}textarea{background:#0f172a;color:var(--ink);border-color:var(--line)}button.btn{background:#1e293b;color:var(--ink)}.tag{background:#312e81;color:#e0e7ff}.bar{background:#334155}}
+
+.kpi{border-top:3px solid var(--pri)}.k4 .kpi:nth-child(2){border-color:var(--High)}.k4 .kpi:nth-child(3){border-color:#7c3aed}.k4 .kpi:nth-child(4){border-color:#0891b2}
+.donutwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
+svg text{fill:var(--ink)}svg .m{fill:var(--mute)}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--mute);margin-top:8px}
+.ebar i{background:var(--c,var(--pri))}
+</style></head><body>
+<div class="app">
+<nav class="side" aria-label="Main"><h1>HTIF<small>Threat Intelligence</small></h1>
+ <button class="on" data-v="dash">Dashboard</button><button data-v="an">Analyze report</button><button data-v="hist">History</button><button data-v="about">About</button></nav>
+<div class="main">
+ <div class="top"><h2 id="title">Dashboard</h2><div id="status"><i></i><span>Checking server…</span></div></div>
+ <div class="page">
+
+ <section id="dash">
+  <div class="grid k4">
+   <div class="card kpi"><div class="v" id="k1">0</div><div class="l">Reports analyzed</div></div>
+   <div class="card kpi"><div class="v" id="k2">0</div><div class="l">High or critical</div></div>
+   <div class="card kpi"><div class="v" id="k3">0</div><div class="l">Indicators found</div></div>
+   <div class="card kpi"><div class="v" id="k4">0</div><div class="l">Unique entities</div></div></div>
+  <div class="grid c2 mt"><div class="card"><h3>Attack types</h3><div id="cats"></div></div><div class="card"><h3>Severity levels</h3><div id="sevs"></div></div></div>
+  <div class="grid c2 mt"><div class="card"><h3>Severity trend (latest 20 reports)</h3><div id="trend"></div></div><div class="card"><h3>Most mentioned entities</h3><div id="topent"></div></div></div>
+  <div class="grid c2 mt"><div class="card"><h3>Entity types</h3><div id="etypes"></div></div><div class="card"><h3>Entity network across reports</h3><div id="gnet"></div></div></div>
+  <div class="card mt"><h3>Recent reports</h3><div class="scroll" id="recent"></div></div>
+ </section>
+
+ <section id="an" class="hidden">
+  <div class="card"><h3>Threat report</h3><textarea id="t" aria-label="Threat report text" placeholder="Paste a security blog post, advisory or incident report"></textarea>
+   <div class="actions"><button class="btn pri" id="go">Analyze</button><button class="btn" id="sample">Use sample</button><button class="btn" id="clear">Clear</button></div></div>
+  <div id="res"></div>
+ </section>
+
+ <section id="hist" class="hidden"><div class="card"><h3>Analysis history</h3><div class="scroll" id="histtbl"></div>
+  <div class="actions"><button class="btn" id="csv">Export CSV</button><button class="btn" id="wipe">Clear history</button></div></div></section>
+
+ <section id="about" class="hidden"><div class="card"><h3>About</h3>
+  <p>HTIF turns an unstructured threat report into structured intelligence in four steps.</p>
+  <table><tr><th>Step</th><th>Method</th><th>Output</th></tr>
+  <tr><td>Embeddings</td><td>SecureBERT with gated indicator fusion</td><td>Context-aware token vectors</td></tr>
+  <tr><td>Entity tagging</td><td>BiLSTM-CRF</td><td>Malware, actors, techniques, vulnerabilities, products, indicators</td></tr>
+  <tr><td>Correlation</td><td>Graph attention network</td><td>Links between entities across reports</td></tr>
+  <tr><td>Classification</td><td>CNN and XGBoost soft vote</td><td>Attack type and severity score</td></tr></table>
+  <p class="mute">Severity is a rule-based score from the predicted type, indicator count and CVE presence. History is stored in this browser only.</p></div></section>
+ </div></div></div>
+<script>
+const $=s=>document.querySelector(s),E=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LBL={phishing:"Phishing",ransomware:"Ransomware",ddos:"DDoS",vuln_exploit:"Vulnerability exploit",malware:"Malware",other:"Other"};
+const TITLES={dash:"Dashboard",an:"Analyze report",hist:"History",about:"About"};
+const SAMPLE=`LockBit affiliates exploited CVE-2023-4966 in Citrix and encrypted the file servers. The group used credential dumping with Mimikatz and lateral movement before data exfiltration to 185.220.101.4. The ransom note points victims to http://pay-portal.biz/pay. Sample hash: 44d88612fea8a8f36de82e1278abb02f. Administrators should patch Citrix immediately.`;
+let H=[];try{H=JSON.parse(localStorage.getItem("htif_hist")||"[]")}catch(e){}
+const save=()=>{try{localStorage.setItem("htif_hist",JSON.stringify(H.slice(0,100)))}catch(e){}};
+const badge=l=>`<span class="badge b-${l}">${l}</span>`;
+const nIoc=d=>Object.values(d.iocs).flat().length;
+
+function nav(v){document.querySelectorAll(".side button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+ document.querySelectorAll(".page>section").forEach(s=>s.classList.toggle("hidden",s.id!==v));$("#title").textContent=TITLES[v];
+ if(v==="dash")dash();if(v==="hist")hist()}
+document.querySelectorAll(".side button").forEach(b=>b.onclick=()=>nav(b.dataset.v));
+
+
+const PAL=["#2563eb","#7c3aed","#0891b2","#16a34a","#d97706","#dc2626","#64748b"];
+const ETC={MALWARE:"#ea580c",ACTOR:"#7c3aed",TECHNIQUE:"#0891b2",VULNERABILITY:"#d97706",PRODUCT:"#2563eb",IOC:"#db2777"};
+const SEVC={Low:"#16a34a",Medium:"#d97706",High:"#ea580c",Critical:"#dc2626"};
+const NONE='<p class="mute">No data yet. Analyze a report to see results here.</p>';
+function donut(data,colors,center){
+ const tot=data.reduce((a,b)=>a+b[1],0);if(!tot)return NONE;
+ const r=44,c=2*Math.PI*r;let off=0,arcs="";
+ data.forEach(([l,v],i)=>{const len=v/tot*c;arcs+=`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${colors[i%colors.length]}" stroke-width="18" stroke-dasharray="${len} ${c-len}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"/>`;off+=len});
+ return `<div class="donutwrap"><svg viewBox="0 0 120 120" width="150" role="img" aria-label="Donut chart">${arcs}<text x="60" y="66" text-anchor="middle" style="font-size:20px;font-weight:700">${center}</text></svg><div>${data.map(([l,v],i)=>`<div><span class="dot" style="background:${colors[i%colors.length]}"></span>${E(l)} <b>${v}</b></div>`).join("")}</div></div>`}
+function gauge(v,l){const r=50,c=2*Math.PI*r,f=c*v/10;
+ return `<div style="text-align:center"><svg viewBox="0 0 130 130" width="150" role="img" aria-label="Severity ${v} of 10"><circle cx="65" cy="65" r="${r}" fill="none" stroke="#8883" stroke-width="13"/><circle cx="65" cy="65" r="${r}" fill="none" stroke="${SEVC[l]}" stroke-width="13" stroke-linecap="round" stroke-dasharray="${f} ${c}" transform="rotate(-90 65 65)"/><text x="65" y="70" text-anchor="middle" style="font-size:30px;font-weight:700">${v}</text><text class="m" x="65" y="88" text-anchor="middle" style="font-size:11px">out of 10</text></svg><div style="font-weight:700;color:${SEVC[l]}">${E(l)}</div></div>`}
+function line(vals){
+ if(vals.length<2)return '<p class="mute">Analyze at least two reports to see a trend.</p>';
+ const W=520,Hh=190,p=30,n=vals.length,x=i=>p+i*(W-2*p)/(n-1),y=v=>Hh-p-(v/10)*(Hh-2*p);
+ const pts=vals.map((v,i)=>[x(i),y(v)]),path=pts.map((q,i)=>(i?"L":"M")+q[0]+" "+q[1]).join(" ");
+ const grid=[0,5,10].map(g=>`<line x1="${p}" x2="${W-p}" y1="${y(g)}" y2="${y(g)}" stroke="#8883"/><text class="m" x="${p-6}" y="${y(g)+4}" text-anchor="end" style="font-size:10px">${g}</text>`).join("");
+ return `<svg viewBox="0 0 ${W} ${Hh}" width="100%" role="img" aria-label="Severity trend">${grid}<path d="${path} L${x(n-1)} ${y(0)} L${x(0)} ${y(0)} Z" fill="#2563eb22"/><path d="${path}" fill="none" stroke="#2563eb" stroke-width="2.5"/>${pts.map((q,i)=>`<circle cx="${q[0]}" cy="${q[1]}" r="4" fill="${SEVC[vals[i]>=7?"Critical":vals[i]>=5?"High":vals[i]>=3?"Medium":"Low"]}"/>`).join("")}</svg>`}
+function net(edges){
+ const names=[...new Set(edges.flat())];if(!names.length)return '<p class="mute">No entity links yet.</p>';
+ const W=640,Hh=380,cx=W/2,cy=Hh/2,rx=cx-110,ry=cy-45,deg={},pos={};
+ edges.forEach(([a,b])=>{deg[a]=(deg[a]||0)+1;deg[b]=(deg[b]||0)+1});
+ names.forEach((n,i)=>{const a=2*Math.PI*i/names.length-Math.PI/2;pos[n]=[cx+rx*Math.cos(a),cy+ry*Math.sin(a)]});
+ let o=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" role="img" aria-label="Entity network">`;
+ edges.forEach(([a,b])=>o+=`<line x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}" stroke="#64748b" stroke-opacity=".3"/>`);
+ names.forEach(n=>{const [ty,...rest]=n.split("|"),[px,py]=pos[n],lbl=rest.join("|").slice(0,24),right=px>=cx;
+  o+=`<circle cx="${px}" cy="${py}" r="${6+Math.min(deg[n],6)}" fill="${ETC[ty]||"#64748b"}" stroke="#fff" stroke-width="1.5"><title>${E(ty)}: ${E(lbl)}</title></circle><text x="${px+(right?14:-14)}" y="${py+4}" text-anchor="${right?"start":"end"}" style="font-size:11px">${E(lbl)}</text>`});
+ return o+"</svg>"+legend()}
+const legend=()=>`<div class="legend">${Object.entries(ETC).map(([k,c])=>`<span><span class="dot" style="background:${c}"></span>${k.toLowerCase()}</span>`).join("")}</div>`;
+
+function bars(o,n){const e=Object.entries(o).sort((a,b)=>b[1]-a[1]);return e.length?e.map(([k,v])=>`<div class="row"><span>${E(k)}</span><div class="bar"><i style="width:${n?v/n*100:0}%"></i></div><span>${v}</span></div>`).join(""):'<p class="mute">No data yet. Analyze a report to see results here.</p>'}
+function table(rows){return rows.length?`<table><tr><th>Time</th><th>Report</th><th>Attack type</th><th>Severity</th><th>Indicators</th></tr>${rows.map(h=>`<tr><td>${E(h.time)}</td><td>${E(h.text.slice(0,70))}…</td><td>${E(LBL[h.d.category]||h.d.category)}</td><td>${badge(h.d.severity_level)} ${h.d.severity}</td><td>${nIoc(h.d)}</td></tr>`).join("")}</table>`:'<p class="mute">No reports yet.</p>'}
+function dash(){
+ $("#k1").textContent=H.length;$("#k2").textContent=H.filter(h=>["High","Critical"].includes(h.d.severity_level)).length;
+ $("#k3").textContent=H.reduce((n,h)=>n+nIoc(h.d),0);$("#k4").textContent=new Set(H.flatMap(h=>h.d.entities.map(e=>e.text.toLowerCase()))).size;
+ const c={},sv={Low:0,Medium:0,High:0,Critical:0},tc={},ec={},pair={};
+ H.forEach(h=>{const k=LBL[h.d.category]||h.d.category;c[k]=(c[k]||0)+1;sv[h.d.severity_level]++;
+  h.d.entities.forEach(e=>{tc[e.type]=(tc[e.type]||0)+1;const key=e.type+"|"+e.text.toLowerCase();ec[key]=(ec[key]||0)+1});
+  h.d.graph.edges.forEach(([x,y])=>{const q=[x,y].sort().join("¦");pair[q]=(pair[q]||0)+1})});
+ const ce=Object.entries(c),se=Object.entries(sv).filter(x=>x[1]>0),te=Object.entries(tc);
+ $("#cats").innerHTML=donut(ce,PAL,H.length);
+ $("#sevs").innerHTML=donut(se,se.map(x=>SEVC[x[0]]),H.length);
+ $("#trend").innerHTML=line(H.slice(0,20).reverse().map(h=>h.d.severity));
+ const top=Object.entries(ec).sort((a,b)=>b[1]-a[1]).slice(0,6),mx=top.length?top[0][1]:1;
+ $("#topent").innerHTML=top.length?top.map(([k,v])=>{const [ty,...r]=k.split("|");return `<div class="row"><span title="${ty}">${E(r.join("|").slice(0,18))}</span><div class="bar ebar"><i style="width:${v/mx*100}%;--c:${ETC[ty]||"#2563eb"}"></i></div><span>${v}</span></div>`}).join(""):NONE;
+ $("#etypes").innerHTML=donut(te,te.map(x=>ETC[x[0]]||"#64748b"),te.reduce((a,b)=>a+b[1],0));
+ const all=Object.keys(pair).map(q=>q.split("¦")),deg={};all.forEach(([x,y])=>{deg[x]=(deg[x]||0)+1;deg[y]=(deg[y]||0)+1});
+ const keep=new Set(Object.entries(deg).sort((a,b)=>b[1]-a[1]).slice(0,14).map(x=>x[0]));
+ $("#gnet").innerHTML=net(all.filter(([x,y])=>keep.has(x)&&keep.has(y)));
+ $("#recent").innerHTML=table(H.slice(0,5));
+}
+function hist(){$("#histtbl").innerHTML=table(H)}
+function render(d){
+ const p=Object.entries(d.probabilities).sort((a,b)=>b[1]-a[1]),io=Object.entries(d.iocs),rel=Object.entries(d.graph.related);
+ const tc={};d.entities.forEach(e=>tc[e.type]=(tc[e.type]||0)+1);const tl=Object.entries(tc);
+ $("#res").innerHTML=
+ `<div class="grid c2 mt"><div class="card"><h3>Result</h3><div class="donutwrap">${gauge(d.severity,d.severity_level)}<div style="flex:1;min-width:200px"><p style="font-size:20px;margin:0 0 8px"><b>${E(LBL[d.category]||d.category)}</b></p>
+   ${p.map(([k,v])=>`<div class="row" style="grid-template-columns:110px 1fr 40px"><span>${E(LBL[k]||k)}</span><div class="bar"><i style="width:${v*100}%"></i></div><span>${Math.round(v*100)}%</span></div>`).join("")}</div></div></div>
+  <div class="card"><h3>Entity types</h3>${tl.length?donut(tl,tl.map(([k])=>ETC[k]||"#64748b"),d.entities.length):'<p class="mute">No entities found.</p>'}</div></div>
+  <div class="card mt"><h3>Entity network</h3>${net(d.graph.edges)}</div>
+  <div class="grid c2 mt"><div class="card"><h3>Indicators of compromise</h3>${io.length?`<table><tr><th>Type</th><th>Value</th></tr>${io.flatMap(([k,v])=>v.map(x=>`<tr><td>${E(k.toUpperCase())}</td><td class="mono">${E(x)}</td></tr>`)).join("")}</table>`:'<p class="mute">None found.</p>'}</div>
+  <div class="card"><h3>Extracted entities (${d.entities.length})</h3>${d.entities.length?`<table><tr><th>Entity</th><th>Type</th></tr>${d.entities.map(e=>`<tr><td>${E(e.text)}</td><td><span class="tag" style="background:${ETC[e.type]||"#64748b"}22;color:${ETC[e.type]||"#64748b"}">${E(e.type)}</span></td></tr>`).join("")}</table>`:'<p class="mute">None found.</p>'}</div></div>
+  ${rel.length?`<div class="card mt"><h3>Seen with these entities in earlier reports</h3><table>${rel.map(([k,v])=>`<tr><td>${E(k.replace("|"," · "))}</td><td>${v.map(x=>E(x.replace("|"," · "))).join(", ")}</td></tr>`).join("")}</table></div>`:""}`;
+}
+async function run(){
+ const text=$("#t").value.trim();if(!text){$("#t").focus();return}
+ $("#go").disabled=true;$("#go").textContent="Analyzing…";
+ try{const r=await fetch("/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});
+  const d=await r.json();if(!r.ok)throw new Error(d.detail||r.statusText);
+  render(d);H.unshift({time:new Date().toLocaleString(),text,d});save();
+ }catch(e){$("#res").innerHTML=`<div class="card err mt"><b>Could not analyze the report.</b> ${E(e.message)}</div>`}
+ $("#go").disabled=false;$("#go").textContent="Analyze";
+}
+$("#go").onclick=run;$("#sample").onclick=()=>{$("#t").value=SAMPLE;run()};$("#clear").onclick=()=>{$("#t").value="";$("#res").innerHTML=""};
+$("#wipe").onclick=()=>{if(confirm("Delete all saved history?")){H=[];save();hist()}};
+$("#csv").onclick=()=>{const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+ const rows=[["time","attack_type","severity","level","indicators","report"],...H.map(h=>[h.time,h.d.category,h.d.severity,h.d.severity_level,nIoc(h.d),h.text])];
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(q).join(",")).join("\n")],{type:"text/csv"}));a.download="htif_history.csv";a.click()};
+fetch("/health").then(r=>{if(!r.ok)throw 0;$("#status").className="ok";$("#status span").textContent="Server online"}).catch(()=>{$("#status").className="bad";$("#status span").textContent="Server offline"});
+dash();
+</script></body></html>
